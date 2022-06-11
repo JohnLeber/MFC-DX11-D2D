@@ -28,14 +28,13 @@ static UINT indicators[] =
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
 };
-
+//-------------------------------------------------------------//
 // CMainFrame construction/destruction
-
 CMainFrame::CMainFrame() noexcept
 {
 	m_pView[0] = m_pView[1] = m_pView[2] = m_pView[3] = 0;
 }
-
+//-------------------------------------------------------------//
 CMainFrame::~CMainFrame()
 {
 	//D3D
@@ -45,15 +44,6 @@ CMainFrame::~CMainFrame()
 		m_pD3DImmediateContext->Release();
 	}
 
-	//if (m_pSwapChain)
-	//{
-	//	m_pSwapChain->Release();
-	//}
-	if (m_pD3DDevice)
-	{
-		m_pD3DDevice->Release();
-	}
-	
 	//D2D
 	if (m_pTextFormat)
 	{
@@ -68,19 +58,16 @@ CMainFrame::~CMainFrame()
 		m_pD2DFactory->Release();
 	}
 
-	//DXGI
-	//if (m_pDXGIDevice)
-	//{
-	//	m_pDXGIDevice->Release();
-	//}
-	//if (m_pDXGIAdapter)
-	//{
-	//	m_pDXGIAdapter->Release();
-	//}
-	if (m_pDXGIFactory)
+#if defined(DEBUG) || defined(_DEBUG)  
+	IDXGIDebug* debugDev = 0;
+	HRESULT hr = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debugDev));
+	debugDev->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+	debugDev->Release();
+#endif
+	if (m_pD3DDevice)
 	{
-		m_pDXGIFactory->Release();
-	} 
+		m_pD3DDevice->Release();
+	}
 }
 //-------------------------------------------------------------//
 bool CMainFrame::Initialize()
@@ -95,12 +82,19 @@ bool CMainFrame::Initialize()
 		ATLASSERT(0);
 		return false;
 	}
+//#if defined(DEBUG) || defined(_DEBUG)  
+//	IDXGIDebug* debugDev = 0;
+//	HRESULT hr = DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debugDev));
+//	debugDev->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+//	debugDev->Release();
+//#endif
 	return true;
 }
 //-------------------------------------------------------------//
 bool CMainFrame::InitD2D()
 {
 	//initialize Direct2D and DirectWrite
+	HRESULT hr = S_OK;
 	if (!m_pD2DFactory)
 	{
 		HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
@@ -113,7 +107,7 @@ bool CMainFrame::InitD2D()
 	{
 		float nTextHeight = 88;
 
-		HRESULT hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(m_pWriteFactory), reinterpret_cast<IUnknown**>(&m_pWriteFactory));
+		hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(m_pWriteFactory), reinterpret_cast<IUnknown**>(&m_pWriteFactory));
 
 		DWRITE_FONT_WEIGHT w = DWRITE_FONT_WEIGHT_NORMAL;
 		DWRITE_FONT_STYLE style = DWRITE_FONT_STYLE_NORMAL;
@@ -126,10 +120,7 @@ bool CMainFrame::InitD2D()
 			L"",
 			&m_pTextFormat
 		);
-
 	}
-
-	HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
 	return SUCCEEDED(hr);
 }
 //-------------------------------------------------------------//

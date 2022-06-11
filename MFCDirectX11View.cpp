@@ -170,6 +170,11 @@ void CMFCDirectX11View::ReCreateBuffers(int w, int h)
 		m_pDepthStencilBuffer->Release();
 		m_pDepthStencilBuffer = 0;
 	}
+	if (m_pDepthStencilView)
+	{
+		m_pDepthStencilView->Release();
+		m_pDepthStencilView = 0;
+	}
 	if (m_pBackBufferRT)
 	{
 		m_pBackBufferRT->Release();
@@ -268,17 +273,17 @@ void CMFCDirectX11View::ReCreateBuffers(int w, int h)
 	{
 		pD2DBackBuffer->Release();
 	}
-	if (pDXGIDevice)
+	if (pDXGIFactory)
 	{
-		pDXGIDevice->Release();
+		pDXGIFactory->Release();
 	}
 	if (pDXGIAdapter)
 	{
 		pDXGIAdapter->Release();
 	}
-	if (pDXGIFactory)
+	if (pDXGIDevice)
 	{
-		pDXGIFactory->Release();
+		pDXGIDevice->Release();
 	} 
 
 	DiscardDeviceResources();

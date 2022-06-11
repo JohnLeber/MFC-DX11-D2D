@@ -37,7 +37,9 @@
 #include <dwrite_3.h> 
 #include "DirectxMath.h"
 #include <DirectXPackedVector.h>
- 
+#if defined(DEBUG) || defined(_DEBUG)  
+#include <dxgidebug.h>
+#endif
 
 #ifdef _UNICODE
 #if defined _M_IX86
